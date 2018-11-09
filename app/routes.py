@@ -11,13 +11,13 @@ Users = Users()
 @app.route("/index")
 @app.route("/")
 def index():
-    return jsonify({"message": "Welcome to sendIT API"}), 200
+    return jsonify([{"message": "Welcome to sendIT API"}]), 200
 
 
-# @app.route("/api/v1/parcels", methods=['POST'])
-# def create_parcel_order():
-#     newparcel = Parcels.create_parcel()
-#     return jsonify(newparcel), 201
+@app.route("/api/v1/parcels", methods=['POST'])
+def create_parcel_order():
+    newparcel = Parcels.create_parcel()
+    return jsonify(newparcel), 201
 
 
 @app.route("/api/v1/users", methods=['POST'])
