@@ -3,30 +3,30 @@ import datetime
 from flask import jsonify, request
 
 parcels = [
-     {
-        'parcelId' : 1,
-        'userId':2,
-        'status':'intransit',
-        'creation_date': '1/11/2018',
-        'pickup': 'jinja',
-        'destination': 'entebbe'
-    },
-    {
-        'parcelId' : 2,
-        'userId':1,
-        'status':'intransit',
-        'creation_date': '1/11/2018',
-        'pickup': 'jinja',
-        'destination': 'katabi'
-    },
-    {
-        'parcelId' : 3,
-        'userId':1,
-        'status':'intransit',
-        'creation_date': '1/11/2018',
-        'pickup': 'jinja',
-        'destination': 'entebbe'
-    }
+#      {
+#         'parcelId' : 1,
+#         'userId':2,
+#         'status':'intransit',
+#         'creation_date': '1/11/2018',
+#         'pickup': 'jinja',
+#         'destination': 'entebbe'
+#     },
+#     {
+#         'parcelId' : 2,
+#         'userId':1,
+#         'status':'intransit',
+#         'creation_date': '1/11/2018',
+#         'pickup': 'jinja',
+#         'destination': 'katabi'
+#     },
+#     {
+#         'parcelId' : 3,
+#         'userId':1,
+#         'status':'intransit',
+#         'creation_date': '1/11/2018',
+#         'pickup': 'jinja',
+#         'destination': 'entebbe'
+#     }
 ]
 users = []
 
@@ -58,24 +58,24 @@ class Parcels:
     def get_parcels(self):
         if len(parcels) > 0:
             return parcels
+        return [{"message":"No parcels have been created"}]
+    def auto_increment_id(self):
+        if not parcels:
+            return 1
+        return parcels[-1]['parcelId']+1
 
-    # def auto_increment_id(self):
-    #     if not parcels:
-    #         return 1
-    #     return parcels[-1]['parcelId']+1
+    def create_parcel(self):
+        request_data = request.get_json(force=True)
 
-    # def create_parcel(self):
-    #     request_data = request.get_json(force=True)
-
-    #     parcel = dict()
-    #     parcel['parcelId'] = self.auto_increment_id()
-    #     parcel['userId'] = request_data['userId']
-    #     parcel['status'] = request_data['status']
-    #     parcel['creation_date'] = datetime.date.today().strftime('%Y-%m-%d')
-    #     parcel['pickup'] = request_data['pickup']
-    #     parcel['destination'] = request_data['destination']
-
-    #     return parcel
+        parcel = dict()
+        parcel['parcelId'] = self.auto_increment_id()
+        parcel['userId'] = request_data['userId']
+        parcel['status'] = request_data['status']
+        parcel['creation_date'] = datetime.date.today().strftime('%Y-%m-%d')
+        parcel['pickup'] = request_data['pickup']
+        parcel['destination'] = request_data['destination']
+        parcels.append(parcel)
+        return parcel, {"message":"Your order has been created"}
 
 
     # def get_specific_parcel(self, parcelId):
@@ -87,7 +87,7 @@ class Parcels:
 
     # def get_parcels_by_specific_user(self, userId):
     #     if not userId:
-    #         return {"message": "please enter userId"}
+            # return {"message": "please enter userId"}
     #     for parcel in parcels:
     #         if parcel['userId'] == userId:
                
