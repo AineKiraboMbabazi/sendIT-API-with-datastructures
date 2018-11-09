@@ -81,14 +81,11 @@ class Parcels:
 
 
     def get_specific_parcel(self, parcelId):
-        if not parcelId:
-            return [{"message": "please enter parcelId"}]
-        if not isinstance(parcelId,int):
-            return {"message":"The parcel id must be an integer"}
+     
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
                 return parcel
-            return {"message":"The parcel with that id doesnot exist"}
+        return {"message":"The parcel with that id doesnot exist"}
 
     # def get_parcels_by_specific_user(self, userId):
     #     if not userId:
