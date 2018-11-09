@@ -1,7 +1,7 @@
 import unittest
 from flask import json, request, jsonify
-import sys
-sys.path.append("..")
+# import sys
+# sys.path.append("..")
 
 from app.models import users, Users, Parcels, parcels
 from app import routes
@@ -52,6 +52,19 @@ class TestApp(unittest.TestCase):
         self.assertIsNotNone(response[0].get['parcelId'])
         self.assertIsNotNone(response[0].get['creation_date'])
 
+    def test_can_fetch_specific_parcel(self):
+        self.assertEqual(self.Parcels.get_specific_parcel(),[{"message": "please enter parcelId"}])
+        self.assertIsInstance(self.Parcels.get_specific_parcel(1),dict)
+        self.assertIsInstance(self.Parcels.get_specific_parcel('a'),{"message":"The parcel id must be an integer"})
+        self.assertIsInstance(self.Parcels.get_specific_parcel(100000000000),{"message":"The parcel with that id doesnot exist"})
+    
+    def test_fetch_specific_parcel_endpoint(self):
+        self.client = app.test_client()
+        response = self.client.get(
+            '/api/v1/parcels/<int:parcelId>', content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNotNone(response)
+    
     def tearDown(self):
         self.Parcels = None
 
