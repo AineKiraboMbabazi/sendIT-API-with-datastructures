@@ -74,16 +74,18 @@ class Parcels:
         parcel['creation_date'] = datetime.date.today().strftime('%Y-%m-%d')
         parcel['pickup'] = request_data['pickup']
         parcel['destination'] = request_data['destination']
+        if not parcel['status'] and parcel['userId'] and parcel['destination'] and parcel['pickup']:
+            return {"message":"some expected field was not filled"}
         parcels.append(parcel)
         return parcel, {"message":"Your order has been created"}
 
 
-    # def get_specific_parcel(self, parcelId):
-    #     if not parcelId:
-    #         return {"message": "please enter parcelId"}
-    #     for parcel in parcels:
-    #         if parcel['parcelId'] == parcelId:
-    #             return parcel
+    def get_specific_parcel(self, parcelId):
+     
+        for parcel in parcels:
+            if parcel['parcelId'] == parcelId:
+                return parcel
+        return {"message":"The parcel with that id doesnot exist"}
 
     # def get_parcels_by_specific_user(self, userId):
     #     if not userId:

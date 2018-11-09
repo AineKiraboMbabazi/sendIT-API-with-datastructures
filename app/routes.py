@@ -38,10 +38,10 @@ def fetch_all_parcels():
     return jsonify(all_parcels), 200
 
 
-# @app.route("/api/v1/parcels/<int:parcelId>", methods=['GET'])
-# def fetch_specific_parcel(parcelId):
-#     single_parcel = Parcels.get_specific_parcel(parcelId)
-#     return jsonify(single_parcel), 200
+@app.route("/api/v1/parcels/<int:parcelId>", methods=['GET'])
+def fetch_specific_parcel(parcelId):
+    single_parcel = Parcels.get_specific_parcel(parcelId)
+    return jsonify(single_parcel), 200
 
 
 # @app.route("/api/v1/users/<int:userId>/parcels", methods=['GET'])
