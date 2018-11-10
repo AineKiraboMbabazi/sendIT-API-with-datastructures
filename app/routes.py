@@ -44,10 +44,10 @@ def fetch_specific_parcel(parcelId):
     return jsonify(single_parcel), 200
 
 
-# @app.route("/api/v1/users/<int:userId>/parcels", methods=['GET'])
-# def fetch_all_parcels_by_user(userId):
-#     parcels_by_user = Parcels.get_parcels_by_specific_user(userId)
-#     return jsonify(parcels_by_user), 200
+@app.route("/api/v1/users/<int:userId>/parcels", methods=['GET'])
+def fetch_all_parcels_by_user(userId):
+    parcels_by_user = Parcels.get_parcels_by_specific_user(userId)
+    return jsonify(parcels_by_user), 200
 
 
 # @app.route("/api/v1/parcels/<int:parcelId>", methods=['PUT'])
