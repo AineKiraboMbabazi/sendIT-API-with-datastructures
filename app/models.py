@@ -87,13 +87,18 @@ class Parcels:
                 return parcel
         return {"message":"The parcel with that id doesnot exist"}
 
-    # def get_parcels_by_specific_user(self, userId):
-    #     if not userId:
-            # return {"message": "please enter userId"}
-    #     for parcel in parcels:
-    #         if parcel['userId'] == userId:
-               
-    #             return parcel
+    def get_parcels_by_specific_user(self, userId):
+        
+        newparcel=list()
+        message={"message":"The user with that Id has not created any parcel Delivery orders"}
+        for parcel in parcels:
+            if parcel['userId'] == userId:
+               newparcel.append(parcel)
+               if len(newparcel)>1:
+                   message={"Created by":userId,"Number of parcels":len(newparcel)}
+        return message,newparcel
+        
+        
 
     # def delete_specific_parcel(self, parcelId):
     #     if not parcelId:
