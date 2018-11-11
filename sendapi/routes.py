@@ -1,8 +1,8 @@
 
 from flask import  request, jsonify
-from app import app
-from app.models import parcels, Parcels
-from app.models import users, Users
+from sendapi import app
+from sendapi.models import parcels, Parcels
+from sendapi.models import users, Users
 
 Parcels = Parcels()
 Users = Users()
@@ -11,7 +11,7 @@ Users = Users()
 @app.route("/index")
 @app.route("/")
 def index():
-    return jsonify([{"message": "Welcome to sendIT API"}]), 200
+    return jsonify({"message": "Welcome to sendIT API"}), 200
 
 
 @app.route("/api/v1/parcels", methods=['POST'])
@@ -50,7 +50,7 @@ def fetch_all_parcels_by_user(userId):
     return jsonify(parcels_by_user), 200
 
 
-# @app.route("/api/v1/parcels/<int:parcelId>", methods=['PUT'])
-# def cancel_specific_parcel(parcelId):
-#     cancel_order = Parcels.delete_specific_parcel(parcelId)
-#     return jsonify(cancel_order), 204
+@app.route("/api/v1/parcels/<int:parcelId>", methods=['PUT'])
+def cancel_specific_parcel(parcelId):
+    cancel_order = Parcels.cancel_specific_parcel(parcelId)
+    return jsonify(cancel_order), 200
