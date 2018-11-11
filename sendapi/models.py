@@ -3,36 +3,35 @@ import datetime
 from flask import jsonify, request
 
 parcels = [
-#      {
-#         'parcelId' : 1,
-#         'userId':2,
-#         'status':'intransit',
-#         'creation_date': '1/11/2018',
-#         'pickup': 'jinja',
-#         'destination': 'entebbe'
-#     },
-#     {
-#         'parcelId' : 2,
-#         'userId':1,
-#         'status':'intransit',
-#         'creation_date': '1/11/2018',
-#         'pickup': 'jinja',
-#         'destination': 'katabi'
-#     },
-#     {
-#         'parcelId' : 3,
-#         'userId':1,
-#         'status':'intransit',
-#         'creation_date': '1/11/2018',
-#         'pickup': 'jinja',
-#         'destination': 'entebbe'
-#     }
+    #      {
+    #         'parcelId' : 1,
+    #         'userId':2,
+    #         'status':'intransit',
+    #         'creation_date': '1/11/2018',
+    #         'pickup': 'jinja',
+    #         'destination': 'entebbe'
+    #     },
+    #     {
+    #         'parcelId' : 2,
+    #         'userId':1,
+    #         'status':'intransit',
+    #         'creation_date': '1/11/2018',
+    #         'pickup': 'jinja',
+    #         'destination': 'katabi'
+    #     },
+    #     {
+    #         'parcelId' : 3,
+    #         'userId':1,
+    #         'status':'intransit',
+    #         'creation_date': '1/11/2018',
+    #         'pickup': 'jinja',
+    #         'destination': 'entebbe'
+    #     }
 ]
 users = []
 
 
 class Users:
-    
 
     def auto_increment_id(self):
         if not users:
@@ -46,24 +45,31 @@ class Users:
         user['userId'] = self.auto_increment_id()
         user['email'] = request_data['email']
         user['password'] = request_data['password']
-        
+        users.append(user)
         return user
 
     def get_users(self):
         if len(users) > 0:
             return users
-        
-        return {"message":"No users have been created"}
+
+        return {"message": "No users have been created"}
+
 
 def reset_parcels():
-        parcels.clear()
+    parcels.clear()
+
+
+def reset_users():
+    users.clear()
+
+
 class Parcels:
-    
-    
+
     def get_parcels(self):
         if len(parcels) > 0:
             return parcels
-        return {"message":"No parcels have been found"}
+        return {"message": "No parcels have been found"}
+
     def auto_increment_id(self):
         if not parcels:
             return 1
@@ -80,36 +86,34 @@ class Parcels:
         parcel['pickup'] = request_data['pickup']
         parcel['destination'] = request_data['destination']
         if not parcel['status'] and parcel['userId'] and parcel['destination'] and parcel['pickup']:
-            return {"message":"some expected field was not filled"}
+            return {"message": "some expected field was not filled"}
         parcels.append(parcel)
-        return parcel, {"message":"Your order has been created"}
-
+        return parcel, {"message": "Your order has been created"}
 
     def get_specific_parcel(self, parcelId):
-     
+
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
                 return parcel
-        return {"message":"The parcel with that id doesnot exist"}
+        return {"message": "The parcel with that id doesnot exist"}
 
     def get_parcels_by_specific_user(self, userId):
-        
-        newparcel=list()
-        message={"message":"The user with that Id has not created any parcel Delivery orders"}
+
+        newparcel = list()
+
         for parcel in parcels:
             if parcel['userId'] == userId:
-               newparcel.append(parcel)
-               if len(newparcel)>1:
-                   message={"Created by":userId,"Number of parcels":len(newparcel)}
-        return message,newparcel
-        
-        
+                newparcel.append(parcel)
+        if len(newparcel) == 0:
+            message = {
+                "message": "The user with that Id has not created any parcel Delivery orders"}
+            return message
+        return newparcel
 
     def cancel_specific_parcel(self, parcelId):
-        
+
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
-                parcel['status']='canceled'
-                return {"message": "parcel delivery order has been canceled"},parcel
-        return {"message":"The order you are trying to cancel doesnot exist"}
-
+                parcel['status'] = 'canceled'
+                return {"message": "parcel delivery order has been canceled"}, parcel
+        return {"message": "The order you are trying to cancel doesnot exist"}
