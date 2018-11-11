@@ -32,6 +32,7 @@ users = []
 
 
 class Users:
+    
 
     def auto_increment_id(self):
         if not users:
@@ -44,21 +45,25 @@ class Users:
         user = dict()
         user['userId'] = self.auto_increment_id()
         user['email'] = request_data['email']
-        user['email'] = request_data['passord']
-
+        user['password'] = request_data['password']
+        
         return user
 
     def get_users(self):
         if len(users) > 0:
             return users
+        
+        return {"message":"No users have been created"}
 
-
+def reset_parcels():
+        parcels.clear()
 class Parcels:
+    
     
     def get_parcels(self):
         if len(parcels) > 0:
             return parcels
-        return [{"message":"No parcels have been created"}]
+        return {"message":"No parcels have been found"}
     def auto_increment_id(self):
         if not parcels:
             return 1
@@ -100,10 +105,11 @@ class Parcels:
         
         
 
-    # def delete_specific_parcel(self, parcelId):
-    #     if not parcelId:
-    #         return {"message": "please enter parcelId"}
-    #     for parcel in parcels:
-    #         if parcel['parcelId'] == parcelId:
-    #             parcels.remove(parcel)
-    #             return {"message": "parcel delivery order has been canceled"}
+    def cancel_specific_parcel(self, parcelId):
+        
+        for parcel in parcels:
+            if parcel['parcelId'] == parcelId:
+                parcel['status']='canceled'
+                return {"message": "parcel delivery order has been canceled"},parcel
+        return {"message":"The order you are trying to cancel doesnot exist"}
+
