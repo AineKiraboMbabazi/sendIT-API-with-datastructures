@@ -259,14 +259,8 @@ class TestApp(unittest.TestCase):
 
         response = json.loads(response.data)
 
-        self.assertEqual(response, [
-            {'creation_date': '2018-11-11',
-             'destination': 'Arua',
-             'parcelId': 1,
-             'pickup': 'Masaka',
-             'status': 'canceled',
-             'userId': 2}
-        ])
+      
+        self.assertEqual(response[0]['status'],'canceled')
         self.assertIsInstance(response, list)
         self.assertIsNotNone(response[0]['destination'])
         self.assertIsNotNone(response[0]['pickup'])
