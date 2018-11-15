@@ -22,12 +22,9 @@ class ParcelController:
         data = [status, pickup, destination]
 
         for item in data:
-            if not item or item.isspace():
-                return jsonify({"message": "one parameter is missing"}), 400
-
             letters = re.compile('[A-Za-z]')
-            if not letters.match(item):
-                return jsonify({"message": "must contain letters"}), 400
+            if not letters.match(item) :
+                return jsonify({"message": "status,destination and pickup Fields should contain strings"}), 400
 
         parcel = Parcel(userId, status, pickup, destination).to_dictionary()
         for user in users:
