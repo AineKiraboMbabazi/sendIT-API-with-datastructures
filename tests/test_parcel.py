@@ -171,7 +171,7 @@ class TestApp(unittest.TestCase):
         ))
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json, {"message": "one parameter is missing"})
+            response.json, {"message": "status,destination and pickup Fields should contain strings"})
 
     def test_create_parcels_with_empty_pickup(self):
         users.append({
@@ -191,7 +191,7 @@ class TestApp(unittest.TestCase):
         ))
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            response.json, {"message": "one parameter is missing"})
+            response.json, {"message": "status,destination and pickup Fields should contain strings"})
 
     def test_create_parcels_with_invalid_strings(self):
         users.append({
@@ -210,7 +210,7 @@ class TestApp(unittest.TestCase):
             }
         ))
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json, {"message": "must contain letters"})
+        self.assertEqual(response.json, {"message": "status,destination and pickup Fields should contain strings"})
 
     def test_reset_parcel(self):
         self.assertEqual(reset_parcels(), [])
