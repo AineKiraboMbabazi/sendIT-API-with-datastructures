@@ -18,3 +18,7 @@ def fetch_all_users():
 @app.route("/api/v1/users/<int:userId>/parcels", methods=['GET'])
 def fetch_all_parcels_by_user(userId):    
     return UserController().get_parcels_by_specific_user(userId)
+
+@app.route("/api/v1/users/<int:userId>", methods=['DELETE'])
+def delete_user(userId):
+    return UserController().delete_user(userId)

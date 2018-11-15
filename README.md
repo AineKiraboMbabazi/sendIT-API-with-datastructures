@@ -73,9 +73,11 @@ at the end of the url and change the method to POST
 In the post body add a dictionary with the following fields
 ```
 {
-	"email":" your@mail.com",
-	"password":"anything "
-	
+    "userId":1,
+	"status":"intransit ",
+	"pickup":"jinja",
+	"destination":"entebbe"
+    
 }
 ```
 - Use the same url to get all users by changing the method to

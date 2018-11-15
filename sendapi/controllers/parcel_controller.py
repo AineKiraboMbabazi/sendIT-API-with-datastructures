@@ -2,9 +2,8 @@ import datetime
 import re
 
 from flask import jsonify, request
-from sendapi.models.user_model import User,users
+from sendapi.models.user_model import User, users
 from sendapi.models.parcel_model import parcels, Parcel
-from sendapi.controllers.user_controller import users_list
 
 
 class ParcelController:
@@ -12,7 +11,7 @@ class ParcelController:
     """Function to create a parcel"""
 
     def create_parcel(self):
-        users = users_list()
+        # users = users_list()
         request_data = request.get_json(force=True)
         userId = request_data['userId']
         status = request_data['status']
@@ -20,16 +19,27 @@ class ParcelController:
         destination = request_data['destination']
 
         """ validate id"""
-        validate_id(userId)
+        if not userId:
+            return jsonify({"message": "The Id is required"}), 400
+        if userId < 0:
+            return jsonify({"message": "The Id must be a positive integer"}), 400
+        if not isinstance(userId, int):
+            return jsonify({"message": "The Id must be an integer"}), 400
 
         """ validate status, pickup and destination """
-        validate_parcel_string_data(status, pickup, destination)
+        data = [status, pickup, destination]
+        for item in data:
+            if not item or item.isspace():
+                return jsonify({"message": "one parameter is missing"}), 400
+            letters = re.compile('[A-Za-z]')
+            if not letters.match(item):
+                return jsonify({item: "must contain letters"}), 400
 
         parcel = Parcel(userId, status, pickup, destination).to_dictionary()
         for user in users:
             if user['userId'] == userId:
                 parcels.append(parcel)
-                return jsonify(parcels), 201
+                return jsonify(parcel), 201
 
             return jsonify({"message": "The user id that you have entered doesnot  exist"}), 200
 
@@ -43,7 +53,14 @@ class ParcelController:
     """Function to fetch a particular parcel"""
 
     def get_specific_parcel(self, parcelId):
-        validate_id(parcelId)
+        """ validate id"""
+        if not parcelId:
+            return jsonify({"message": "The Id is required"}), 400
+        if parcelId < 0:
+            return jsonify({"message": "The Id must be a positive integer"}), 400
+        if not isinstance(parcelId, int):
+            return jsonify({"message": "The Id must be an integer"}), 400
+        
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
                 return jsonify(parcel), 200
@@ -52,7 +69,14 @@ class ParcelController:
     """Function to cancel an parcel"""
 
     def cancel_specific_parcel(self, parcelId):
-        validate_id(parcelId)
+        """ validate id"""
+        if not parcelId:
+            return jsonify({"message": "The Id is required"}), 400
+        if parcelId < 0:
+            return jsonify({"message": "The Id must be a positive integer"}), 400
+        if not isinstance(parcelId, int):
+            return jsonify({"message": "The Id must be an integer"}), 400
+        
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
                 parcel['status'] = 'canceled'
@@ -62,7 +86,14 @@ class ParcelController:
     """Function to delete a parcel"""
 
     def delete_parcel(self, parcelId):
-        validate_id(parcelId)
+        """ validate id"""
+        if not parcelId:
+            return jsonify({"message": "The Id is required"}), 400
+        if parcelId < 0:
+            return jsonify({"message": "The Id must be a positive integer"}), 400
+        if not isinstance(parcelId, int):
+            return jsonify({"message": "The Id must be an integer"}), 400
+
         for parcel in parcels:
             if parcel['parcelId'] == parcelId:
                 parcels.remove(parcel)
@@ -81,25 +112,3 @@ def return_parcels():
 
 def reset_parcels():
     parcels.clear()
-
-
-""" input validation """
-
-
-def validate_parcel_string_data(status, pickup, destination):
-    data = [status, pickup, destination]
-    for item in data:
-        if not item or item.isspace():
-            return jsonify({item: " is missing"}), 400
-        letters = re.compile('[A-Za-z]')
-        if not letters.match(item):
-            return jsonify({item: "must contain letters"}), 400
-
-
-def validate_id(id):
-    if not id:
-        return jsonify({"message": "The Id is required"}), 400
-    if id < 0:
-        return jsonify({"message": "The Id must be a positive integer"}), 400
-    if not isinstance(id, int):
-        return jsonify({"message": "The Id must be an integer"}), 400
