@@ -124,6 +124,27 @@ class TestUserendpoint(unittest.TestCase):
         self.assertIsInstance(response_data, dict)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response_data,{"message": "Your user has been deleted"})  
+    def test_endpoint_fetches_all_userparcels(self):
+        parcels.append(  {
+                "parcelId":1,
+                "destination": "Arua",
+                "pickup": "Masaka",
+                "status": " ",
+                "userId": 1
+            })
+        response =self.client.get(
+            '/api/v1/users/1/parcels', content_type='application/json')
+        self.assertEqual(response.status_code,200)
+        self.assertIsInstance(response.json,list)
+        self.assertEqual(response.json,[ {
+                "parcelId":1,
+                "destination": "Arua",
+                "pickup": "Masaka",
+                "status": " ",
+                "userId": 1
+            }])
+
+    
     def tearDown(self):
         
         reset_users()
