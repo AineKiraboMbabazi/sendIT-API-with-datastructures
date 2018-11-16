@@ -1,3 +1,4 @@
-service_name: travis-ci
-repo_token: DyYK87QXJzn8tYUkIE19WOGp0lnBARyzp
-parallel: true
+service_name: travis-pro
+repo_token: GMRNc9ujI4HIQouB1XRYjxrrHS9RSEMrm
+            
+
