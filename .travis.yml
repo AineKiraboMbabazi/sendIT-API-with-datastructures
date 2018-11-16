@@ -8,6 +8,6 @@ install:
   - pip install coveralls
 script:
   - pyt-cov=sendapi/
-after_success:
+after_script:
   -coveralls
   
