@@ -1,8 +1,8 @@
 from flask import request, jsonify
 from sendapi import app
-from sendapi.models.user_model import users, User
-from sendapi.models.parcel_model import parcels, Parcel
-from sendapi.controllers.user_controller import UserController
+from sendapi.models.user import users, User
+from sendapi.models.parcel import parcels, Parcel
+from sendapi.controllers.user  import UserController
 
 
 @app.route("/api/v1/users", methods=['POST'])
