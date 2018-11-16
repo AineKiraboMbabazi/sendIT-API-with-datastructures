@@ -6,7 +6,9 @@ from sendapi.models.parcel_model import parcels, Parcel
 
 class UserController:
 
-    """ function creates user"""
+    """ 
+        function creates user
+    """
 
     def create_user(self):
         request_data = request.get_json(force=True)
@@ -27,7 +29,9 @@ class UserController:
         users.append(user)
         return jsonify(user), 201
 
-    """Function retrieves all users"""
+    """
+        Function retrieves all users
+    """
 
     def get_users(self):
         if len(users) > 0:
@@ -35,7 +39,9 @@ class UserController:
 
         return jsonify({"message": "No users have been created"}), 200
 
-    """ function retrieves parcels by a user"""
+    """
+        function retrieves parcels by a user
+    """
 
     def get_parcels_by_specific_user(self, userId):
 
@@ -50,7 +56,9 @@ class UserController:
             return jsonify({"message": "The user with that Id has not created any parcel Delivery orders"}), 200
         return jsonify(userparcels), 200
 
-    """Function to delete a user"""
+    """
+        Function to delete a user
+    """
 
     def delete_user(self, userId):
 
@@ -60,7 +68,10 @@ class UserController:
                 return jsonify({"message": "Your user has been deleted"}), 200
 
 
-"""function to reset users"""
+"""
+    function to reset users
+"""
+
 
 def reset_users():
     users.clear()
