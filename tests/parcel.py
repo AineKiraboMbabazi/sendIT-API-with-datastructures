@@ -2,10 +2,10 @@ import unittest
 import datetime
 from flask import json, request, jsonify
 from sendapi import app
-from sendapi.models.parcel_model import parcels, Parcel
-from sendapi.models.user_model import users, User
-from sendapi.controllers.parcel_controller import ParcelController, reset_parcels
-from sendapi.controllers.user_controller import reset_users
+from sendapi.models.parcel import parcels, Parcel
+from sendapi.models.user import users, User
+from sendapi.controllers.parcel import ParcelController, reset_parcels
+from sendapi.controllers.user import reset_users
 
 
 class TestApp(unittest.TestCase):

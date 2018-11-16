@@ -2,8 +2,8 @@ import datetime
 import re
 
 from flask import jsonify, request
-from sendapi.models.user_model import User, users
-from sendapi.models.parcel_model import parcels, Parcel
+from sendapi.models.user import User, users
+from sendapi.models.parcel import parcels, Parcel
 
 
 class ParcelController:

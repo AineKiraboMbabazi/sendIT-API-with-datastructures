@@ -1,11 +1,11 @@
 import unittest
 from flask import json, request, jsonify
 from sendapi import app
-from sendapi.models.user_model import users, User
-from sendapi.models.parcel_model import parcels
+from sendapi.models.user import users, User
+from sendapi.models.parcel import parcels
 from sendapi.routes import user_routes
-from sendapi.controllers.parcel_controller import reset_parcels 
-from sendapi.controllers.user_controller import UserController, reset_users
+from sendapi.controllers.parcel import reset_parcels 
+from sendapi.controllers.user import UserController, reset_users
 
 
 class TestUserendpoint(unittest.TestCase):
