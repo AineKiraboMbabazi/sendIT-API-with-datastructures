@@ -3,7 +3,7 @@ from flask import json, request, jsonify
 from sendapi import app
 from sendapi.models.user import users, User
 from sendapi.models.parcel import parcels
-from sendapi.routes import user_routes
+from sendapi.routes import user
 from sendapi.controllers.parcel import reset_parcels 
 from sendapi.controllers.user import UserController, reset_users
 

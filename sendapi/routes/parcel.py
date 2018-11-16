@@ -1,9 +1,9 @@
 
 from flask import request, jsonify
 from sendapi import app
-from sendapi.models.user_model import User
-from sendapi.models.parcel_model import parcels, Parcel
-from sendapi.controllers.parcel_controller import ParcelController 
+from sendapi.models.user import User
+from sendapi.models.parcel import parcels, Parcel
+from sendapi.controllers.parcel import ParcelController 
 
 
 """Endpoint for the index page"""
