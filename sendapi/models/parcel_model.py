@@ -1,6 +1,8 @@
 import datetime
 
-"""list to store the parcels"""
+"""
+    list to store the parcels
+"""
 parcels = []
 
 
@@ -13,7 +15,10 @@ class Parcel:
         self.pickup = pickup
         self.destination = destination
 
-    """Function to create parcel dictionary"""
+    """
+        Function to create parcel dictionary
+        
+        """
 
     def to_dictionary(self):
         parcel = {
