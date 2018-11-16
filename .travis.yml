@@ -7,7 +7,7 @@ install:
   - pip install pytest-cov
   - pip install coveralls
 script:
-  - pytest --cov=sendapi/
-after_script:
+  - pyt-cov=sendapi/
+after_success:
   -coveralls
   
