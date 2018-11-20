@@ -1,6 +1,6 @@
 import psycopg2
-import psycopg2.extras
-from flask import Flask
+# import psycopg2.extras
+from flask import Flask,jsonify
 
 import os
 app=Flask(__name__)
@@ -13,16 +13,19 @@ class DatabaseConnection:
             :param user:
             :param password :
         """
-        self.con_parameter=dict(
+        try:
+            self.con_parameter=dict(
             database="sendit",
             user="postgres",
             password="postgres"
-        )
-        self.con=psycopg2.connect(**self.con_parameter)
-        self.con.autocommit=True
-        self.cursor= self.con.cursor()
-        self.dict_cursor=self.con.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            )
+            self.con=psycopg2.connect(**self.con_parameter)
+            self.con.autocommit=True
+            self.cursor= self.con.cursor()
+            # self.dict_cursor=self.con.cursor(cursor_factory=psycopg2.extras.DictCursor)
 
+        except Exception:
+            return jsonify({"message":"Cant connect to database"})
     def create_db_tables(self):
         """
             Create users table
