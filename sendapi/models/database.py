@@ -1,5 +1,5 @@
 import psycopg2
-# import psycopg2.extras
+from psycopg2.extras import RealDictCursor
 from flask import Flask,jsonify
 
 import os
@@ -22,7 +22,7 @@ class DatabaseConnection:
             self.con=psycopg2.connect(**self.con_parameter)
             self.con.autocommit=True
             self.cursor= self.con.cursor()
-            # self.dict_cursor=self.con.cursor(cursor_factory=psycopg2.extras.DictCursor)
+            self.dict_cursor=self.con.cursor(cursor_factory=RealDictCursor)
 
         except Exception:
             return jsonify({"message":"Cant connect to database"})

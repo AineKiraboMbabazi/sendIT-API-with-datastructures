@@ -23,7 +23,8 @@ def create_user():
     password = request_data['password']
     if email=='admin@admin.com':
         role='admin'
-    role='user'
+    else:
+        role='user'
 
     validate_email(email)
     validate_password(password)   

@@ -1,21 +1,41 @@
-# import unittest
-# from flask import json, request, jsonify
-# from sendapi import app
-# from sendapi.models.user import users, User
-# from sendapi.models.parcel import parcels
-# from sendapi.routes import user
-# from sendapi.controllers.parcel import reset_parcels 
-# from sendapi.controllers.user import UserController, reset_users
+import unittest
+from flask import json, jsonify
+from sendapi.routes.user import fetch_all_users, delete_user
+from sendapi import app
+from sendapi.models.database import DatabaseConnection
 
 
-# class TestUserendpoint(unittest.TestCase):
-    
-#     user={
-#         "email": "me@gmail.com",
-#         "password": "intransit"
-#         }
-#     def setUp(self):
-#         self.client=app.test_client()
+class TestUsers(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+
+    user={
+        "email": "me@gmail.com",
+        "password": "intransit"
+        }
+
+
+    def test_endpoint_fetches_all_users(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(
+            {
+                "email": "mbabazi@gmaail.com",
+                "password": "password"
+            }
+        ))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(
+            {
+                "email": "mbabazi@gmaail.com",
+                "password": "password"
+            }
+        ))
+        
+        self.assertEqual(response.status_code,200)
+        # authentication_token=response.json['auth_token']
+        # get_users=self.client.get('/api/v1/users', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        # self.assertEqual(get_users.status_code,200)
+        # print(get_users.json)
+        # 
 
 #     """Test endpoint creates user"""
 #     def test_endpoint_posts_user(self):
@@ -145,10 +165,9 @@
 #             }])
 
     
-#     def tearDown(self):
-        
-#         reset_users()
-#         reset_parcels()
+    def tearDown(self):
+        databasecon = DatabaseConnection()
+        databasecon.drop_table('users')
    
-# if "__name__" == "__main__":
-#     unittest.main()
+if "__name__" == "__main__":
+    unittest.main()
