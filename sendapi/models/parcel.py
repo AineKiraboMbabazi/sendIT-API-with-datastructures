@@ -37,7 +37,7 @@ class Parcel:
         con.cursor.execute(change_destination, (newdestination, parcelId))
 
     def fetch_parcels_by_user(self, userId):
-        fetch_parcels_by_user = "SELECT * FROM parcels WHERE parcelId=%s"
+        fetch_parcels_by_user = "SELECT * FROM parcels WHERE userId=%s"
         con.dict_cursor.execute(fetch_parcels_by_user, (userId,))
         parcels=con.dict_cursor.fetchall()
         return parcels
