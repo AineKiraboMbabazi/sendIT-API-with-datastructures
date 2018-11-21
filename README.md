@@ -101,9 +101,13 @@ In the post body add a dictionary with the following fields
 * python
 * REST
 # Project Links #
+```
 https://send-data.herokuapp.com/
+```
+```
 https://ainekirabombabazi.github.io/sendIT-/UI
+```
 # Authors #
-** Ainekirabo Mbabazi **
+** Ainekirabo Mbabazi ** 
 
 
