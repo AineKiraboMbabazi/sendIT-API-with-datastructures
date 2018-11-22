@@ -16,10 +16,10 @@ class TestUsers(unittest.TestCase):
                 "email": "admin@admin.com",
                 "password": "password"
             }
-        # self.parcel={
-        #         "pickup": "entebbe",
-        #         "destination": "jinja"
-        #     }
+        self.parcel={
+                "pickup": "entebbe",
+                "destination": "jinja"
+            }
  
     def test_endpoint_fetches_all_users(self):
         result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
@@ -47,17 +47,18 @@ class TestUsers(unittest.TestCase):
         self.assertEqual(get_users.json,{"message":"Only Admin can view all users"})
 
     
-    # def test_endpoint_fetches_all_userparcels(self):
-    #     result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
-    #     self.assertEqual(result.status_code,201)
-    #     response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
-    #     self.assertEqual(response.status_code,200)
-    #     authentication_token=response.json['auth_token']
-    #     self.client.post('/api/v1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
-    #     self.assertEqual(result.status_code,201)
-    #     get_users=self.client.get('/api/v1/users/1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
-    #     self.assertEqual(get_users.status_code,400)
-    #     self.assertEqual(get_users.json,{"message":"Only admin can delete users"})
+    def test_endpoint_fetches_all_userparcels(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        self.assertEqual(result.status_code,201)
+        get_users=self.client.get('/api/v1/users/1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,401)
+        self.assertEqual(get_users.json,{"message":'You are not logged in'})
+    
     def test_endpoint_deletes_user(self):
         result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
         self.assertEqual(result.status_code,201)

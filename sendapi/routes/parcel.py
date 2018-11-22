@@ -35,7 +35,7 @@ def create_parcel_order():
         return jsonify({"message": "Some fields are missing"}), 400
     userid = get_jwt_identity()
     if not userid:
-        return jsonify({"message": "You are not a registered user"})
+        return jsonify({'msg': 'Missing Authorization Header'}),401
     request_data = request.get_json(force=True)
     userId = userid
     status = 'pending'
@@ -70,7 +70,7 @@ def fetch_all_parcels():
         return jsonify({'msg': 'Missing Authorization Header'}),401
     get_user = user.get_user_by_id(userid)
     if not get_user:
-        return jsonify({"message":" No parcels to fetch"}),404
+        return jsonify({"message":" No user with that id"}),404
     if get_user['role'] == 'admin':
         parcel=Parcel()
         parcels = parcel.get_all_parcels()
@@ -114,6 +114,8 @@ def update_present_location(parcelId):
     if editor != 'admin':
         return jsonify({"message": "You can only update the present location if you are an admin"}), 400
     request_data = request.get_json(force=True)
+    if len(request_data.keys() )!= 1:
+        return jsonify({"message": "Some fields are missing"}), 400
     newlocation = request_data['new location']
     validate_input=Validator().validate_string_input(newlocation)
     if not validate_input:
@@ -135,6 +137,8 @@ def update_destination(parcelId):
     if editor != 'admin':
         return jsonify({"message": "You can only update the present location if you are an admin"}), 400
     request_data = request.get_json(force=True)
+    if len(request_data.keys() )!= 1:
+        return jsonify({"message": "Some fields are missing"}), 400
     destination = request_data['destination']
     letters = re.compile('[A-Za-z]')
     if not destination or destination.isspace() or not letters.match(destination):

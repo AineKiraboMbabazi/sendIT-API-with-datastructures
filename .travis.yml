@@ -6,7 +6,14 @@ install:
   - pip install -r requirements.txt
   - pip install pytest-cov
   - pip install coveralls
+services:
+  - postgresql
+before_script:
+  - psql -c "CREATE DATABASE sendit;" -U postgres
+  
 script:
+  - coveralls
+  - coverage
   - pytest --cov=sendapi/
 after_script:
   -coveralls
