@@ -8,6 +8,8 @@ from sendapi.models.database import DatabaseConnection
 class TestBase(unittest.TestCase):
     def setUp(self):
         self.client = app.test_client()
+        databasecon = DatabaseConnection()
+        databasecon.create_db_tables()
         self.client = app.test_client()
         self.parcel = {
             "destination": "Arua",

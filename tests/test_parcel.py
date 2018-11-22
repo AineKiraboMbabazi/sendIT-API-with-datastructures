@@ -124,16 +124,16 @@ class TestParcel(TestBase):
         get_parcel=self.client.get('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
         self.assertEqual(get_parcel.status_code,200)
 
-    # def test_cancel_specific_parcel(self):
-    #     result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
-    #     self.assertEqual(result.status_code,201)
-    #     response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
-    #     self.assertEqual(response.status_code,200)
-    #     authentication_token=response.json['auth_token']
-    #     self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
-    #     get_parcel=self.client.put('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
-    #     self.assertEqual(get_parcel.status_code,200)
-    #     self.assertEqual(get_parcel.json,{"message": "Your parcel order has been cancelled"})
+    def test_cancel_specific_parcel(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.put('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcel.status_code,200)
+        self.assertEqual(get_parcel.json,{"message": "Your parcel order has been cancelled"})
 
     def test_cancel_specific_parcel_which_doesnt_exist(self):
         result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
