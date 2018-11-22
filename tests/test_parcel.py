@@ -1,7 +1,7 @@
 import datetime
 import unittest
 from flask import json, jsonify
-from sendapi.routes.auth import create_user, login
+#from sendapi.routes.auth import create_user, login
 from sendapi import app
 from .test_base import TestBase
 from sendapi.models.database import DatabaseConnection

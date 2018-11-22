@@ -1,6 +1,6 @@
 import unittest
 from flask import json, jsonify
-from sendapi.routes.auth import create_user, login
+#from sendapi.routes.auth import create_user, login
 from sendapi import app
 from sendapi.models.database import DatabaseConnection
 
