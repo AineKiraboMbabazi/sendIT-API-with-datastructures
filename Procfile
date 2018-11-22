@@ -1,1 +1,1 @@
-web: gunicorn -w 1 run:app
+web: gunicorn sendapi:app
