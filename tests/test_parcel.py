@@ -3,41 +3,12 @@ import unittest
 from flask import json, jsonify
 from sendapi.routes.auth import create_user, login
 from sendapi import app
+from .test_base import TestBase
 from sendapi.models.database import DatabaseConnection
 
 
-class TestAuth(unittest.TestCase):
-    def setUp(self):
-        self.client = app.test_client()
-        self.parcel = {
-            "destination": "Arua",
-            "pickup": "Masaka"}
-
-        self.parcel_with_missing_fields= {
-            "pickup": "Masaka"}
-
-        self.parcel_with_invalid_destination = {
-            "destination": "  ",
-            "pickup": "Masaka"}
-        
-        self.parcel_with_invalid_pickup = {
-            "destination": "Arua",
-            "pickup": "        "}
-        self.user={
-            "email": "me@gmail.com",
-            "password": "intransit"
-            }
-        self.admin={
-                "email": "admin@admin.com",
-                "password": "password"
-            }
-        self.present_location={
-            "new location":"ntinda"
-        }
-        self.newdestination={
-            "destination":"ntinda"
-        }
-
+class TestParcel(TestBase):
+     
 
     def test_index(self):
         result=self.client.get('/', content_type='application/json')

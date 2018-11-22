@@ -50,6 +50,7 @@ class DatabaseConnection:
                 destination VARCHAR(30),
                 pickup VARCHAR(30),
                 present_location VARCHAR(30),
+                description VARCHAR(100),
                 FOREIGN KEY (userId) REFERENCES users(userId)ON UPDATE CASCADE
                 );""")
 
@@ -66,8 +67,8 @@ class DatabaseConnection:
             :param table_name:
         """
         self.cursor.execute("TRUNCATE TABLE {} RESTART IDENTITY CASCADE".format(table_name))
+    
 
-       
 if __name__ == '__main__':
     con=DatabaseConnection()
     con.create_db_tables()

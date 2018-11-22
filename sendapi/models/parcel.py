@@ -7,7 +7,7 @@ class Parcel:
     """
         controller class
     """
-    def create_parcel(self,userId,creation_date, status, destination, pickup, present_location):
+    def create_parcel(self,userId,creation_date, status, destination, pickup, present_location,description):
         """
             Function to create parcel delivery order
             :param userId:
@@ -17,8 +17,8 @@ class Parcel:
             :param destination :
             :param present_location :
         """
-        add_parcel = "INSERT INTO parcels (userId,creation_date,status,destination,pickup,present_location) VALUES (%s,%s,%s,%s,%s,%s)"
-        con.cursor.execute(add_parcel, (userId,creation_date, status, destination, pickup, present_location))
+        add_parcel = "INSERT INTO parcels (userId,creation_date,status,destination,pickup,present_location,description) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        con.cursor.execute(add_parcel, (userId,creation_date, status, destination, pickup, present_location,description))
 
     def get_all_parcels(self):
         """
