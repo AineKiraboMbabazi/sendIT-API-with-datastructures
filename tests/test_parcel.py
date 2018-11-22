@@ -191,12 +191,13 @@ class TestAuth(unittest.TestCase):
         authentication_token=response.json['auth_token']
         self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
         get_parcel=self.client.put('/api/v1/parcels/present_location/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.present_location))
+        print(get_parcel.json)
         self.assertEqual(get_parcel.status_code,200)
 
     def test_update_destination(self):
-        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
         self.assertEqual(result.status_code,201)
-        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
         self.assertEqual(response.status_code,200)
         authentication_token=response.json['auth_token']
         self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))

@@ -13,7 +13,8 @@ import os
 @app.route('/api/v1/auth/signup', methods=[ 'POST'])
 def create_user():
     """ 
-    function creates user
+        Function creates user
+        :return success message:
     """
     request_data = request.get_json()
     print (request_data)
@@ -21,26 +22,29 @@ def create_user():
         return jsonify({"message":"some fields are missing"}),400
     email = request_data['email']
     password = request_data['password']
-    if email=='admin@admin.com':
-        role='admin'
-    else:
-        role='user'
     signup_validator=Validator()
     if not signup_validator.validate_email(email):
         return jsonify({"message": "You entered an invalid email or the email is missing"}), 400
 
     if not signup_validator.validate_password(password):
         return jsonify({"message": "You entered an invalid password or password is missing"}), 400
+    if email=='admin@admin.com':
+        role='admin'
+    else:
+        role='user'
     user = User()
     if user.get_user_by_email(email):
         return jsonify({"message":"Email already exists"}),400
     user.create_user(request_data['email'],request_data['password'],role)
-    registered_user=user.get_user_by_email(email)
-    if registered_user:
-        return jsonify({"message":"user created successfully"}),201
+    user.get_user_by_email(email)
+    return jsonify({"message":"user created successfully"}),201
 
 @app.route('/api/v1/auth/login', methods=[ 'POST'])
 def login():
+    """ 
+        Function login user
+        :return success message, authentication token, userId:
+    """
     request_data = request.get_json(force=True)
     if len(request_data.keys())!=2:
         return jsonify({"message":"some fields are missing"}),400

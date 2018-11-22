@@ -56,8 +56,9 @@ class TestUsers(unittest.TestCase):
         self.client.post('/api/v1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
         self.assertEqual(result.status_code,201)
         get_users=self.client.get('/api/v1/users/1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
-        self.assertEqual(get_users.status_code,401)
-        self.assertEqual(get_users.json,{"message":'You are not logged in'})
+        self.assertEqual(get_users.status_code,200)
+        self.assertIsInstance(get_users.json,dict)
+        self.assertEqual(get_users.json,{'user parcels': [{'creation_date': 'Thu, 22 Nov 2018 00:00:00 GMT', 'destination': 'jinja', 'parcelid':1, 'pickup': 'entebbe', 'present_location': 'entebbe', 'status': 'pending', 'userid': 1}]})
     
     def test_endpoint_deletes_user(self):
         result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))

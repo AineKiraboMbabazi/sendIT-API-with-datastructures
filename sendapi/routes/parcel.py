@@ -63,6 +63,10 @@ def create_parcel_order():
 @app.route("/api/v1/parcels", methods=['GET'])
 @jwt_required
 def fetch_all_parcels():
+    """ 
+        Function fetch all parcels
+        :return parcels list:
+    """
     parcel = Parcel()
     user = User()
     userid = get_jwt_identity()
@@ -83,6 +87,10 @@ def fetch_all_parcels():
 
 @app.route("/api/v1/parcels/<int:parcelId>", methods=['GET'])
 def fetch_specific_parcel(parcelId):
+    """ 
+        Function fetch specific parcel
+        :return parcel:
+    """
     parcel = Parcel()
     single_parcel = parcel.get_single_parcel(parcelId)
     if not single_parcel:
@@ -93,6 +101,10 @@ def fetch_specific_parcel(parcelId):
 @app.route("/api/v1/parcels/<int:parcelId>", methods=['PUT'])
 @jwt_required
 def cancel_specific_parcel(parcelId):
+    """ 
+        Function cancel parcel
+        :return success message:
+    """
     userid = get_jwt_identity()
     parcel = Parcel()
     if not parcel.get_single_parcel(parcelId):
@@ -107,6 +119,10 @@ def cancel_specific_parcel(parcelId):
 @app.route("/api/v1/parcels/present_location/<int:parcelId>", methods=['PUT'])
 @jwt_required
 def update_present_location(parcelId):
+    """ 
+        Function to update present location
+        :return success message:
+    """
     userid = get_jwt_identity()
     parcel = Parcel()
     user = User()
@@ -128,30 +144,41 @@ def update_present_location(parcelId):
 @app.route("/api/v1/parcels/destination/<int:parcelId>", methods=['PUT'])
 @jwt_required
 def update_destination(parcelId):
+    """ 
+        Function update destination
+        :return success message:
+    """
     userid = get_jwt_identity()
     parcel = Parcel()
     user = User()
     editor = user.get_user_by_id(userid)['role']
+    parcel=parcel.get_single_parcel(parcelId)
+    if not parcel:
+        return jsonify({"message":"The parcel you are editing doesnt exist"}),404
     if not editor:
-        return jsonify({"message":"You are not a registered Admin of the system"}),401
-    if editor != 'admin':
-        return jsonify({"message": "You can only update the present location if you are an admin"}), 400
+        return jsonify({"message":"You are not a registered user of the system"}),401
+    if editor != 'user' or parcel['userid']!=userid:
+        return jsonify({"message": "You can only update destination of the parcel you have created "}), 400
     request_data = request.get_json(force=True)
     if len(request_data.keys() )!= 1:
         return jsonify({"message": "Some fields are missing"}), 400
     destination = request_data['destination']
-    letters = re.compile('[A-Za-z]')
-    if not destination or destination.isspace() or not letters.match(destination):
+    validate_destination=Validator().validate_string_input(destination)
+    if not validate_destination:
         jsonify({"message":"destination must be a non empty string"}),400
-    
-    parcel.update_destination(parcelId, destination)
-    parcel=parcel.get_single_parcel(parcelId)
+    Parcel().update_destination(parcelId, destination)
+    # parcel.update_destination(parcelId, destination)
+    parcel=Parcel().get_single_parcel(parcelId)
     return jsonify({"message": "Your destination has been updated ","updated parcel":parcel}), 200
 
 
 @app.route("/api/v1/parcels/<int:parcelId>", methods=['DELETE'])
 @jwt_required
 def delete_parcel(parcelId):
+    """ 
+        Function delete
+        :return success message:
+    """
     userid = get_jwt_identity()
     user = User()
     parcel = Parcel()
