@@ -1,9 +1,10 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from flask import Flask,jsonify
+from flask import Flask, jsonify
 
 import os
-app=Flask(__name__)
+app = Flask(__name__)
+
 
 class DatabaseConnection:
     def __init__(self):
@@ -14,23 +15,24 @@ class DatabaseConnection:
             :param password :
         """
         try:
-            self.con_parameter=dict(
-            database="sendit",
-            user="postgres",
-            password="postgres"
+            self.con_parameter = dict(
+                database="sendit",
+                user="postgres",
+                password="postgres"
             )
-            self.con=psycopg2.connect(**self.con_parameter)
-            self.con.autocommit=True
-            self.cursor= self.con.cursor()
-            self.dict_cursor=self.con.cursor(cursor_factory=RealDictCursor)
+            self.con = psycopg2.connect(**self.con_parameter)
+            self.con.autocommit = True
+            self.cursor = self.con.cursor()
+            self.dict_cursor = self.con.cursor(cursor_factory=RealDictCursor)
 
         except Exception:
-            return jsonify({"message":"Cant connect to database"})
+            return jsonify({"message": "Cant connect to database"})
+
     def create_db_tables(self):
         """
             Create users table
         """
-        create_users_table=(
+        create_users_table = (
             """CREATE TABLE IF NOT EXISTS
             users(
                 userId SERIAL PRIMARY KEY NOT NULL,
@@ -40,7 +42,7 @@ class DatabaseConnection:
             );"""
         )
 
-        create_parcels_table=(
+        create_parcels_table = (
             """CREATE TABLE IF NOT EXISTS
             parcels(
                 parcelId SERIAL PRIMARY KEY NOT NULL,
@@ -60,15 +62,15 @@ class DatabaseConnection:
         self.cursor.execute(create_users_table)
         self.cursor.execute(create_parcels_table)
 
-
-    def drop_table(self,table_name):
+    def drop_table(self, table_name):
         """ 
             truncate a table
             :param table_name:
         """
-        self.cursor.execute("TRUNCATE TABLE {} RESTART IDENTITY CASCADE".format(table_name))
-    
+        self.cursor.execute(
+            "TRUNCATE TABLE {} RESTART IDENTITY CASCADE".format(table_name))
+
 
 if __name__ == '__main__':
-    con=DatabaseConnection()
+    con = DatabaseConnection()
     con.create_db_tables()
