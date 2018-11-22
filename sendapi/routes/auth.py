@@ -5,7 +5,7 @@ from flask import request, jsonify
 from sendapi.models.user import User
 from config import app_config
 from sendapi import app
-from validations import validate_email,validate_password
+from validations import Validator
 
 import os
 
@@ -23,10 +23,14 @@ def create_user():
     password = request_data['password']
     if email=='admin@admin.com':
         role='admin'
-    role='user'
+    else:
+        role='user'
+    signup_validator=Validator()
+    if not signup_validator.validate_email(email):
+        return jsonify({"message": "You entered an invalid email or the email is missing"}), 400
 
-    validate_email(email)
-    validate_password(password)   
+    if not signup_validator.validate_password(password):
+        return jsonify({"message": "You entered an invalid password or password is missing"}), 400
     user = User()
     if user.get_user_by_email(email):
         return jsonify({"message":"Email already exists"}),400
@@ -42,13 +46,12 @@ def login():
         return jsonify({"message":"some fields are missing"}),400
     email = request_data['email']
     password = request_data['password']
-    expression = re.compile(
-        r"(^[a-zA-Z0-9-.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)")
-    if not expression.match(email) or email.isspace():
+    login_validation=Validator()
+    if not login_validation.validate_email(email):
         return jsonify({"message": "You entered an invalid email or the email is missing"}), 400
 
-    if not password or password.isspace():
-        return jsonify({"message": "You entered an invalid password or password is missing"}), 400
+    if not login_validation.validate_password(password):
+        return jsonify({"message": "You entered an invalid password, password should be atleast 8 characters long"}), 400
 
     user=User()
     check_user=user.get_user_by_email(email)

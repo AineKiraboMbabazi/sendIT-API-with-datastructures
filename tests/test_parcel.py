@@ -1,225 +1,235 @@
-# import unittest
-# import datetime
-# from flask import json, request, jsonify
-# from sendapi import app
-# from sendapi.models.parcel import parcels, Parcel
-# from sendapi.models.user import users, User
-# from sendapi.controllers.parcel import ParcelController, reset_parcels
-# from sendapi.controllers.user import reset_users
+import datetime
+import unittest
+from flask import json, jsonify
+from sendapi.routes.auth import create_user, login
+from sendapi import app
+from sendapi.models.database import DatabaseConnection
 
 
-# class TestApp(unittest.TestCase):
+class TestAuth(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+        self.parcel = {
+            "destination": "Arua",
+            "pickup": "Masaka"}
 
-#     def setUp(self):
+        self.parcel_with_missing_fields= {
+            "pickup": "Masaka"}
 
-#         self.client = app.test_client()
+        self.parcel_with_invalid_destination = {
+            "destination": "  ",
+            "pickup": "Masaka"}
         
+        self.parcel_with_invalid_pickup = {
+            "destination": "Arua",
+            "pickup": "        "}
+        self.user={
+            "email": "me@gmail.com",
+            "password": "intransit"
+            }
+        self.admin={
+                "email": "admin@admin.com",
+                "password": "password"
+            }
+        self.present_location={
+            "new location":"ntinda"
+        }
+        self.newdestination={
+            "destination":"ntinda"
+        }
 
-#     parcel = {"destination": "Arua",
-#               "pickup": "Masaka",
-#               "status": "intransit",
-#               "userId": 2,
-#               "parcelId": 1
-#               }
 
-#     def post_endpoint(self):
+    def test_index(self):
+        result=self.client.get('/', content_type='application/json')
+        self.assertEqual(result.status_code,200)
+        self.assertEqual(result.json,{"message": "Welcome to sendIT API"})
 
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
+    def test_create_parcels(self):
+       
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        self.assertEqual(get_create_parcel.status_code,201)
+        self.assertEqual(get_create_parcel.json,{"message": "Your parcel order has been created"})
 
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": "intransit",
-#                 "userId": 2
-#             }
-#         ))
-#         return response
+    def test_create_parcels_with_no_token(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',data=json.dumps(self.parcel))
+        self.assertEqual(get_create_parcel.status_code,401)
+        self.assertEqual(get_create_parcel.json,{'msg': 'Missing Authorization Header'})
+    def test_create_parcel_with_invalid_destination(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel_with_invalid_destination))
+        self.assertEqual(get_create_parcel.status_code,400)
+        self.assertEqual(get_create_parcel.json,{"message": "destination Field should contain strings"})       
+    def test_create_parcel_with_invalid_pickup(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel_with_invalid_pickup))
+        self.assertEqual(get_create_parcel.status_code,400)
+        self.assertEqual(get_create_parcel.json,{"message": "pickup Field should contain strings"})      
+    def test_create_parcel_with_missing_fields(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel_with_missing_fields))
+        self.assertEqual(get_create_parcel.status_code,400)
+        self.assertEqual(get_create_parcel.json,{"message": "Some fields are missing"})                
+    def test_doesnt_create_parcels_if_not_user(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        get_create_parcel=self.client.post('/api/v1/parcels', content_type='application/json',data=json.dumps(self.parcel))
+        self.assertEqual(get_create_parcel.status_code,401)
+        self.assertEqual(get_create_parcel.json,{'msg': 'Missing Authorization Header'})
 
-#     def get_endpoint(self):
-#         response = self.client.get(
-#             '/api/v1/parcels', content_type='application/json')
-#         return response
+    def test_fetch_all_parcels(self):
+       
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcels=self.client.get('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcels.status_code,200)
 
-#     def test_endpoint_index(self):
-
-#         response = self.client.get(
-#             '/', content_type='application/json')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(json.loads(response.data), {
-#                          "message": "Welcome to sendIT API"})
-
-#     def test_endpoint_fetches_all_entries_before_post(self):
-
-#         response = self.get_endpoint()
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(json.loads(response.data), {
-#                          'message': 'No parcels have been found'})
-
-#     def test_endpoint_fetches_all_entries_after_post(self):
-
-#         parcels.append(self.parcel)
-#         response_data = self.get_endpoint()
-#         response = (response_data).json
-#         self.assertEqual(response, [{"destination": "Arua",
-#                                      "pickup": "Masaka",
-#                                      "status": "intransit",
-#                                      "userId": 2,
-#                                      "parcelId": 1
-#                                      }])
-
-#         self.assertEqual(response_data.status_code, 200)
-
-#     def test_fetch_specific_parcel_endpoint_before_post(self):
-
-#         response = self.client.get(
-#             '/api/v1/parcels/1', content_type='application/json')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertIsInstance(json.loads(response.data), dict)
-#         self.assertEqual(json.loads(response.data), {
-#                          "message": "The parcel with that id doesnot exist"})
-
-#     def test_fetch_specific_parcel_after_post(self):
-#         parcels.append(self.parcel)
-#         response = self.client.get(
-#             '/api/v1/parcels/1', content_type='application/json')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertIsInstance(json.loads(response.data), dict)
-#         self.assertEqual(json.loads(response.data), {"destination": "Arua",
-#                                                      "pickup": "Masaka",
-#                                                      "status": "intransit",
-#                                                      "userId": 2,
-#                                                      "parcelId": 1
-#                                                      })
-
-#     def test_endpoint_doesnot_cancels_order_before_post(self):
-#         response = self.client.put(
-#             '/api/v1/parcels/1', content_type='application/json')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertIsInstance(json.loads(response.data), dict)
-#         self.assertEqual(json.loads(response.data), {
-#                          "message": "The order you are trying to cancel doesnot exist"})
-
-#     def test_endpoint_deletes_specific_order_after_post(self):
-#         parcels.append(self.parcel)
-#         response = self.client.delete(
-#             '/api/v1/parcels/1', content_type='application/json')
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(json.loads(response.data), {
-#                          "message": "Your parcel has been deleted"})
-
+        
     
-#     def test_create_parcels(self):
-#         users.append({
-#             "userId": 1,
-#             "email": "mbabazi@gmil.com ",
-#             "password": " password"
-#         }
-#         )
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
+    def test_fetch_all_parcels_as_user(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcels=self.client.get('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcels.status_code,400)
+        self.assertEqual(get_parcels.json,{"message": "Only administrators can view parcels"})
+    
+    def test_doesnot_fetch_all_parcels_before_post(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_parcels=self.client.get('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcels.status_code,404)
+        self.assertEqual(get_parcels.json,{"message":"No parcels found"})
+    
+    def test_fetch_all_parcels_without_token(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcels=self.client.get('/api/v1/parcels', content_type='application/json')
+        self.assertEqual(get_parcels.status_code,401)
+        self.assertEqual(get_parcels.json,{'msg': 'Missing Authorization Header'})
+    def test_fetch_specific_parcel(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.get('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcel.status_code,200)
 
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": "intransit",
-#                 "userId": 1
-#             }
-#         ))
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(json.loads(response.data), {
-#             "parcelId": 1,
-#             "creation_date": datetime.date.today().strftime('%Y-%m-%d'),
-#             "destination": "Arua",
-#             "pickup": "Masaka",
-#             "status": "intransit",
-#             "userId": 1
-#         })
+    def test_cancel_specific_parcel(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.put('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcel.status_code,200)
+        self.assertEqual(get_parcel.json,{"message": "Your parcel order has been cancelled"})
 
-#     def test_create_parcels_with_unknown_user(self):
-#         users.append({
-#             "userId": 1,
-#             "email": "mbabazi@gmil.com ",
-#             "password": " password"
-#         }
-#         )
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
+    def test_cancel_specific_parcel_which_doesnt_exist(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_parcel=self.client.put('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcel.status_code,404)
+        self.assertEqual(get_parcel.json,{"message":" parcel doesnot exist"})
+    def test_fetch_specific_parcel_when_parcel_doesnot_exist(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_parcel=self.client.get('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_parcel.status_code,404)
+        self.assertEqual(get_parcel.json,{"message":"Parcel with that id doesnot exist"})
 
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": "intransit",
-#                 "userId": 2
-#             }
-#         ))
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(response.json, {"message": "unknown userId"})
+    def test_update_present_location(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.put('/api/v1/parcels/present_location/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.present_location))
+        self.assertEqual(get_parcel.status_code,200)
 
-#     def test_create_parcels_with_empty_status(self):
-#         self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(
-#             {
+    def test_update_destination(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.put('/api/v1/parcels/destination/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.newdestination))
+        self.assertEqual(get_parcel.status_code,200)
 
-#                 "email": "mbabazi@gmil.com ",
-#                 "password": " password"}
-#         ))
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
+    def test_delete_parcel(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.delete('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.newdestination))
+        self.assertEqual(get_parcel.status_code,200)
+        self.assertEqual(get_parcel.json,{"message": "Your parcel has been deleted"})
 
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": " ",
-#                 "userId": 1
-#             }
-#         ))
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(
-#             response.json, {"message": "status,destination and pickup Fields should contain strings"})
+    def test_delete_parcel_as_user(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        get_parcel=self.client.delete('/api/v1/parcels/1', content_type='application/json',headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.newdestination))
+        self.assertEqual(get_parcel.status_code,400)
+        self.assertEqual(get_parcel.json,{"message": "only administrators can delete parcels"})
+    def tearDown(self):
 
-#     def test_create_parcels_with_empty_pickup(self):
-#         users.append({
-#             "userId": 1,
-#             "email": "mbabazi@gmil.com ",
-#             "password": " password"
-#         }
-#         )
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
-
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": " ",
-#                 "userId": 1
-#             }
-#         ))
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(
-#             response.json, {"message": "status,destination and pickup Fields should contain strings"})
-
-#     def test_create_parcels_with_invalid_strings(self):
-#         users.append({
-#             "userId": 1,
-#             "email": "mbabazi@gmil.com ",
-#             "password": " password"
-#         }
-#         )
-#         response = self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
-
-#                 "destination": "2456",
-#                 "pickup": "1234",
-#                 "status": "345 ",
-#                 "userId": 1
-#             }
-#         ))
-#         self.assertEqual(response.status_code, 400)
-#         self.assertEqual(response.json, {"message": "status,destination and pickup Fields should contain strings"})
-
-#     def test_reset_parcel(self):
-#         self.assertEqual(reset_parcels(), [])
-
-#     def tearDown(self):
-
-#         reset_parcels()
-#         reset_users()
+        databasecon = DatabaseConnection()
+        databasecon.drop_table('users')
+        databasecon.drop_table('parcels')
 
 
-# if "__name__" == "__main__":
-#     unittest.main()
+if "__name__" == "__main__":
+    unittest.main()

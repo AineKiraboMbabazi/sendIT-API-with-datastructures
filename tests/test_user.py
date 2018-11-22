@@ -1,154 +1,98 @@
-# import unittest
-# from flask import json, request, jsonify
-# from sendapi import app
-# from sendapi.models.user import users, User
-# from sendapi.models.parcel import parcels
-# from sendapi.routes import user
-# from sendapi.controllers.parcel import reset_parcels 
-# from sendapi.controllers.user import UserController, reset_users
+import unittest
+from flask import json, jsonify
+from sendapi.routes.user import fetch_all_users, delete_user
+from sendapi import app
+from sendapi.models.database import DatabaseConnection
 
 
-# class TestUserendpoint(unittest.TestCase):
-    
-#     user={
-#         "email": "me@gmail.com",
-#         "password": "intransit"
-#         }
-#     def setUp(self):
-#         self.client=app.test_client()
-
-#     """Test endpoint creates user"""
-#     def test_endpoint_posts_user(self):
-#         response = self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(self.user))
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 201)
-#         self.assertEqual(response_data,
-#             {
-#                 "userId":1,
-#                 "email": "me@gmail.com",
-#                 "password": "intransit"
-#             }
-#         )
-    
+class TestUsers(unittest.TestCase):
+    def setUp(self):
+        self.client = app.test_client()
+        self.user={
+            "email": "me@gmail.com",
+            "password": "intransit"
+            }
+        self.admin={
+                "email": "admin@admin.com",
+                "password": "password"
+            }
+        self.parcel={
+                "pickup": "entebbe",
+                "destination": "jinja"
+            }
+ 
+    def test_endpoint_fetches_all_users(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_users=self.client.get('/api/v1/users', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,200)
+        self.assertEqual(get_users.json,[{
+                "email": "admin@admin.com",
+                "password": "password",
+                "role":'admin',
+                "userid":1
+            }])
         
-#     """ Test endpoint doesn't post user without email"""
-#     def test_endpoint_doesnot_post_user_without_email(self):
-
-#         response = self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(
-#             {
-#         "email": " ",
-#         "password": " password"
-#         }
-#         ))
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 400)
-        
-#         self.assertEqual(response_data, {"message": "The email is required"})
-        
-#     """Test endpoint doesnot create user when password field is empty"""
-#     def test_endpoint_doesnt_post_user_without_password(self):
-
-#         response = self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(
-#             {
-#         "email": "me@gmail.com",
-#         "password": " "
-#         }
-#         ))
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 400)
-        
-#         self.assertEqual(response_data, {"message": "The password is required"
-#         })
-
-#     """Test endpoint doesnt create user without a valid email"""
-#     def test_endpoint_doesnt_post_user_without_valid_password(self):
-
-#         response = self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(
-#             {
-#         "email": "itworks",
-#         "password": " password"
-#         }
-#         ))
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 400)
-        
-#         self.assertEqual(response_data, {"message": "You entered an invalid email"})
-
-#     """Test fetch users"""
-#     def test_endpoint_fetches_no_users_before_post(self):
-#         response = self.client.get(
-#             '/api/v1/users', content_type='application/json')
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response_data,{"message": "No users have been created"})
-
-#     def test_endpoint_fetches_all_users_after_post(self):
-#         self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(self.user))
-#         response = self.client.get(
-#             '/api/v1/users', content_type='application/json')
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, list)
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response_data,[{'email': 'me@gmail.com', 'password': 'intransit', 'userId': 1}])
-    
-    
-#     def test_endpoint_fetches_no_parcels_by_user_If_they_dont_exist(self):
-#         response = self.client.get(
-#             '/api/v1/users/1/parcels', content_type='application/json')
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response_data,{"message": "The user with that Id has not created any parcel Delivery orders"})
-    
-#     def test_endpoint_deletes_user(self):
-#         self.client.post('/api/v1/users', content_type='application/json', data=json.dumps(self.user))
-#         self.client.post('/api/v1/parcels', content_type='application/json', data=json.dumps(
-#             {
-
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": "intransit",
-#                 "userId": 1
-#             }
-#         ))
-        
-#         response =self.client.delete(
-#             '/api/v1/users/1', content_type='application/json')
-       
-#         response_data=json.loads(response.data)
-#         self.assertIsInstance(response_data, dict)
-#         self.assertEqual(response.status_code, 200)
-#         self.assertEqual(response_data,{"message": "Your user has been deleted"})  
-#     def test_endpoint_fetches_all_userparcels(self):
-#         parcels.append(  {
-#                 "parcelId":1,
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": " ",
-#                 "userId": 1
-#             })
-#         response =self.client.get(
-#             '/api/v1/users/1/parcels', content_type='application/json')
-#         self.assertEqual(response.status_code,200)
-#         self.assertIsInstance(response.json,list)
-#         self.assertEqual(response.json,[ {
-#                 "parcelId":1,
-#                 "destination": "Arua",
-#                 "pickup": "Masaka",
-#                 "status": " ",
-#                 "userId": 1
-#             }])
+    def test_endpoint_doesnt_fetch_all_users_if_not_admin(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_users=self.client.get('/api/v1/users', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,401)
+        self.assertEqual(get_users.json,{"message":"Only Admin can view all users"})
 
     
-#     def tearDown(self):
-        
-#         reset_users()
-#         reset_parcels()
+    def test_endpoint_fetches_all_userparcels(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        self.client.post('/api/v1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' },data=json.dumps(self.parcel))
+        self.assertEqual(result.status_code,201)
+        get_users=self.client.get('/api/v1/users/1/parcels', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,401)
+        self.assertEqual(get_users.json,{"message":'You are not logged in'})
+    
+    def test_endpoint_deletes_user(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.admin))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_users=self.client.delete('/api/v1/users/1', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,200)
+        self.assertEqual(get_users.json,{"message":"user has been deleted"})
+
+    def test_endpoint_doesnt_delete_user_if_its_not_admin(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_users=self.client.delete('/api/v1/users/1', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,400)
+        self.assertEqual(get_users.json,{"message":"Only admin can delete users"})
+
+    def test_endpoint_fetches_user(self):
+        result=self.client.post('/api/v1/auth/signup', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(result.status_code,201)
+        response=self.client.post('/api/v1/auth/login', content_type='application/json', data=json.dumps(self.user))
+        self.assertEqual(response.status_code,200)
+        authentication_token=response.json['auth_token']
+        get_users=self.client.get('/api/v1/users/1', content_type='application/json', headers={'Authorization':f'Bearer {authentication_token}' })
+        self.assertEqual(get_users.status_code,401)
+        self.assertEqual(get_users.json,{"message":"only admin can access user details"})
+
+    
+    def tearDown(self):
+        databasecon = DatabaseConnection()
+        databasecon.drop_table('users')
    
-# if "__name__" == "__main__":
-#     unittest.main()
+if "__name__" == "__main__":
+    unittest.main()
