@@ -64,7 +64,6 @@ def login():
         auth_token=create_access_token(identity=check_user[0], expires_delta=expires)
         return jsonify({
             'message':'login successful',
-            'userId':check_user[0],
             'auth_token': auth_token}),200
 
     return jsonify({"message":"You are not a system user"}),400

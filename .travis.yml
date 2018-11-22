@@ -10,7 +10,8 @@ services:
   - postgresql
 before_script:
   - psql -c "CREATE DATABASE sendit;" -U postgres
-  
+addons:
+  - postgres: ""
 script:
   - coveralls
   - coverage

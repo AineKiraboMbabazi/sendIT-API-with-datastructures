@@ -31,7 +31,7 @@ def create_parcel_order():
         function to create a parcel
     """
     request_data = request.get_json()
-    if len(request_data.keys() )!= 2:
+    if len(request_data.keys() )!= 3:
         return jsonify({"message": "Some fields are missing"}), 400
     userid = get_jwt_identity()
     if not userid:
@@ -40,17 +40,20 @@ def create_parcel_order():
     userId = userid
     status = 'pending'
     destination = request_data['destination']
+    description = request_data['description']
     pickup = request_data['pickup']
     present_location = pickup
     creation_date= datetime.date.today().strftime('%Y-%m-%d')
     validate_input=Validator()
     if not (validate_input.validate_string_input(destination)):
         return jsonify({"message": "destination Field should contain strings"}), 400
+    if not (validate_input.validate_string_input(description)):
+        return jsonify({"message": "destination Field should contain strings"}), 400
     if not (validate_input.validate_string_input(pickup)):
         return jsonify({"message": "pickup Field should contain strings"}), 400
     parcel = Parcel()
     parcel.create_parcel(
-        userId, creation_date,status, destination, pickup, present_location)
+        userId, creation_date,status, destination, pickup, present_location,description)
     
     return jsonify({"message": "Your parcel order has been created"}), 201
 

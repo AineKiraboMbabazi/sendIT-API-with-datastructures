@@ -11,7 +11,7 @@ class User:
             :param email:
             :return row:
         """
-        check_for_unike_email="SELECT * FROM users WHERE email=%s"
+        check_for_unike_email="SELECT userId, email,role FROM users WHERE email=%s"
         con.cursor.execute(check_for_unike_email,(email,))
         row= con.cursor.fetchone()
         return row
@@ -22,7 +22,7 @@ class User:
             :param userId:
             :return row:
         """
-        get_user="SELECT * FROM users WHERE userId='{0}'".format(userId)
+        get_user="SELECT userId,role ,email FROM users WHERE userId='{0}'".format(userId)
         con.dict_cursor.execute(get_user)
         row= con.dict_cursor.fetchone()
         return row
@@ -33,7 +33,7 @@ class User:
             Function to get all users
             :return rows:
         """
-        get_all="SELECT * FROM users"
+        get_all="SELECT userId,role ,email FROM users"
         con.dict_cursor.execute(get_all)
         rows= con.dict_cursor.fetchall()
         return  rows
