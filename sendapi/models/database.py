@@ -53,7 +53,9 @@ class DatabaseConnection:
                 FOREIGN KEY (userId) REFERENCES users(userId)ON UPDATE CASCADE
                 );""")
 
-        # execute cursor object to create tables
+        """
+            execute cursor object to create tables
+        """
         self.cursor.execute(create_users_table)
         self.cursor.execute(create_parcels_table)
 
@@ -65,7 +67,7 @@ class DatabaseConnection:
         """
         self.cursor.execute("TRUNCATE TABLE {} RESTART IDENTITY CASCADE".format(table_name))
 
-        # self.cursor.execute("DROP TABLE users;")
+       
 if __name__ == '__main__':
     con=DatabaseConnection()
     con.create_db_tables()
