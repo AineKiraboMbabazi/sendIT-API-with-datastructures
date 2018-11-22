@@ -27,7 +27,6 @@ def fetch_all_users():
         return jsonify(user.get_users()),200
     return jsonify({"message":"Only Admin can view all users"}),401
     
-    
 @app.route("/api/v1/users/<int:userId>/parcels", methods=['GET'])
 @jwt_required
 def fetch_all_parcels_by_user(userId):
