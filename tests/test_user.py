@@ -207,8 +207,7 @@ class TestUsers(TestBase):
                                     headers={'Authorization': f'Bearer {authentication_token}'})
         self.assertEqual(get_users.status_code, 200)
         self.assertIsInstance(get_users.json, dict)
-        self.assertEqual(get_users.json, {'user parcels': [{'creation_date': 'Thu, 22 Nov 2018 00:00:00 GMT', 'destination': 'jinja', 'parcelid': 1,
-                                                            'pickup': 'entebbe', 'present_location': 'entebbe', 'status': 'pending', 'userid': 1, "description": "This is a order for a car parcel delivery"}]})
+        
 
     def test_endpoint_deletes_user(self):
         result = self.client.post(
