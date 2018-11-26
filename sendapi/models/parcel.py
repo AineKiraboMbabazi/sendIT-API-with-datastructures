@@ -7,7 +7,8 @@ class Parcel:
     """
         controller class
     """
-    def create_parcel(self,userId,creation_date, status, destination, pickup, present_location,description):
+    def create_parcel(self, userId, creation_date, status, destination, pickup,
+                      present_location, description):
         """
             Function to create parcel delivery order
             :param userId:
@@ -17,8 +18,10 @@ class Parcel:
             :param destination :
             :param present_location :
         """
-        add_parcel = "INSERT INTO parcels (userId,creation_date,status,destination,pickup,present_location,description) VALUES (%s,%s,%s,%s,%s,%s,%s)"
-        con.cursor.execute(add_parcel, (userId,creation_date, status, destination, pickup, present_location,description))
+        add_parcel = "INSERT INTO parcels (userId,creation_date,status,destination,pickup, \
+        present_location,description) VALUES (%s,%s,%s,%s,%s,%s,%s)"
+        con.cursor.execute(add_parcel, (userId, creation_date, status,
+                           destination, pickup, present_location, description))
 
     def get_all_parcels(self):
         """
@@ -80,5 +83,5 @@ class Parcel:
         """
         fetch_parcels_by_user = "SELECT * FROM parcels WHERE userId=%s"
         con.dict_cursor.execute(fetch_parcels_by_user, (userId,))
-        parcels=con.dict_cursor.fetchall()
+        parcels = con.dict_cursor.fetchall()
         return parcels

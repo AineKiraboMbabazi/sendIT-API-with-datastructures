@@ -63,7 +63,7 @@ class DatabaseConnection:
         self.cursor.execute(create_parcels_table)
 
     def drop_table(self, table_name):
-        """ 
+        """
             truncate a table
             :param table_name:
         """
