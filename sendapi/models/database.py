@@ -16,9 +16,10 @@ class DatabaseConnection:
         """
         try:
             self.con_parameter = dict(
-                database="sendit",
-                user="postgres",
-                password="postgres"
+                host="ec2-54-225-110-156.compute-1.amazonaws.com",
+                database="d60ul7j7uuis00",
+                user="tbvsiihjctcizx",
+                password="f1aad00ee06d0276ecc041b6d3ab12fec64132e16b2a7c663d40528bc745b4c8"
             )
             self.con = psycopg2.connect(**self.con_parameter)
             self.con.autocommit = True
