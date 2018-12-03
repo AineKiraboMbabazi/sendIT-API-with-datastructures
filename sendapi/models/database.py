@@ -18,12 +18,15 @@ class DatabaseConnection:
             self.con_parameter = dict(
                 database="sendit",
                 user="postgres",
-                password="postgres"
+                password="postgres",
+                host="localhost",
+                port=5432
             )
             self.con = psycopg2.connect(**self.con_parameter)
             self.con.autocommit = True
             self.cursor = self.con.cursor()
             self.dict_cursor = self.con.cursor(cursor_factory=RealDictCursor)
+            self.create_db_tables()
 
         except Exception:
             return jsonify({"message": "Cant connect to database"})

@@ -56,14 +56,14 @@ def login():
     login_validation = Validator()
     if not login_validation.validate_email(email):
         return jsonify({"message": "You entered an invalid email or the\
-                         email is missing"}), 401
+                         email is missing","status_code":401}), 401
 
     if not login_validation.validate_password(password):
         return jsonify({"message": "You entered an invalid password,\
-                         password should be atleast 8 characters long"}), 401
+                         password should be atleast 8 characters long","status_code":401}), 401
 
     user = User()
-    check_user = user.get_user_by_email(email)
+    check_user = user.find_user(email,password)
     if check_user:
         expires = datetime.timedelta(days=1)
         auth_token = create_access_token(identity=check_user[0],

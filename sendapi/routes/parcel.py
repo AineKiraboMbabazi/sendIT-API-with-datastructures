@@ -47,17 +47,17 @@ def create_parcel_order():
     validate_input = Validator()
     if not (validate_input.validate_string_input(destination)):
         return jsonify({"message": "destination Field should\
-                         contain strings"}), 400
+                         contain strings","status_code":400}), 400
     if not (validate_input.validate_string_input(description)):
-        return jsonify({"message": "destination Field should\
-                         contain strings"}), 400
+        return jsonify({"message": "description Field should\
+                         contain strings","status_code":400}), 400
     if not (validate_input.validate_string_input(pickup)):
-        return jsonify({"message": "pickup Field should contain strings"}), 400
+        return jsonify({"message": "pickup Field should contain strings","status_code":400}), 400
     parcel = Parcel()
     parcel.create_parcel(userId, creation_date, status, destination,
                          pickup, present_location, description)
 
-    return jsonify({"message": "Your parcel order has been created"}), 201
+    return jsonify({"message": "Your parcel order has been created","status_code":201}), 201
 
 
 """

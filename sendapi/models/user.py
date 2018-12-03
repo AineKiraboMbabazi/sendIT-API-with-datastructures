@@ -29,6 +29,20 @@ class User:
         row = con.dict_cursor.fetchone()
         return row
 
+    def find_user(self, email, password):
+        """
+            Function to get_user_by_email_and_password
+            :param email:
+            :param password:
+            :return row:
+        """
+        check_for_unike_email = "SELECT userId, email,role\
+                                 FROM users WHERE email = %s AND password = %s"
+        con.cursor.execute(check_for_unike_email, (email,password,))
+        row = con.cursor.fetchone()
+        return row
+
+
     def get_users(self):
         """
             Function to get all users
