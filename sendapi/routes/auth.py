@@ -25,21 +25,21 @@ def create_user():
     signup_validator = Validator()
     if not signup_validator.validate_email(email):
         return jsonify({"message": "You entered an invalid email or the\
-                         email is missing"}), 400
+                         email is missing", 'status_code': 400}), 400
 
     if not signup_validator.validate_password(password):
         return jsonify({"message": "You entered an invalid password or \
-                        password is missing"}), 400
+                        password is missing", 'status_code': 400}), 400
     if email == 'admin@admin.com':
         role = 'admin'
     else:
         role = 'user'
     user = User()
     if user.get_user_by_email(email):
-        return jsonify({"message": "Email already exists"}), 400
+        return jsonify({"message": "Email already exists", 'status_code': 400}), 400
     user.create_user(request_data['email'], request_data['password'], role)
     user.get_user_by_email(email)
-    return jsonify({"message": "user created successfully"}), 201
+    return jsonify({"message": "user created successfully", 'status_code': 201}), 201
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
@@ -70,6 +70,7 @@ def login():
                                          expires_delta=expires)
         return jsonify({
             'message': 'login successful',
-            'auth_token': auth_token}), 200
+            'auth_token': auth_token,
+            'user_Id': check_user[0]}), 200
 
-    return jsonify({"message": "You are not a system user"}), 401
+    return jsonify({"message": "You are not a system user", 'status_code': 401}), 401

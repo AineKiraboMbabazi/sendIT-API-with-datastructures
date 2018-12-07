@@ -27,7 +27,7 @@ class Parcel:
         """
             Function to fetch all parcels
         """
-        get_all = "SELECT * FROM parcels"
+        get_all = "SELECT * FROM parcels ORDER BY parcelId DESC"
         con.dict_cursor.execute(get_all)
         parcels = con.dict_cursor.fetchall()
         return parcels
@@ -58,14 +58,14 @@ class Parcel:
         delete_query = "DELETE FROM parcels WHERE parcelId=%s"
         con.cursor.execute(delete_query, (parcelId,))
 
-    def update_present_location(self, parcelId, newlocation):
+    def update_present_location(self, parcelId, newlocation, status):
         """
             Function to update_present_location
             :param parcelId:
             :param newlocation:
         """
-        update_query = " UPDATE parcels SET present_location=%s WHERE parcelId=%s"
-        con.cursor.execute(update_query, (newlocation, parcelId))
+        update_query = " UPDATE parcels SET present_location=%s, status=%s WHERE parcelId=%s"
+        con.cursor.execute(update_query, (newlocation, parcelId, status))
 
     def update_destination(self, parcelId, newdestination):
         """
@@ -81,7 +81,7 @@ class Parcel:
             Function to fetch all parcels by a user
             :param userId:
         """
-        fetch_parcels_by_user = "SELECT * FROM parcels WHERE userId=%s"
+        fetch_parcels_by_user = "SELECT * FROM parcels WHERE userId=%s ORDER BY parcelId DESC"
         con.dict_cursor.execute(fetch_parcels_by_user, (userId,))
         parcels = con.dict_cursor.fetchall()
         return parcels

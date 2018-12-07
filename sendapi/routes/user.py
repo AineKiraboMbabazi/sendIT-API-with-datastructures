@@ -42,8 +42,8 @@ def fetch_all_parcels_by_user(userId):
     parcel = Parcel()
     parcels = parcel.fetch_parcels_by_user(userId)
     if not parcels:
-        return jsonify({"message": "User has not yet created any orders"}), 404
-    return jsonify({"user parcels": parcels}), 200
+        return jsonify({"message": "User has not yet created any orders", 'status_code': 404}), 404
+    return jsonify({"parcels": parcels, 'status_code': 200}), 200
 
 
 @app.route("/api/v1/users/<int:userId>", methods=['DELETE'])
