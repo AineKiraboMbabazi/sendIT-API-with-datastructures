@@ -50,17 +50,17 @@ def login():
     """
     request_data = request.get_json(force=True)
     if len(request_data.keys()) != 2:
-        return jsonify({"message": "some fields are missing"}), 401
+        return jsonify({"message": "some fields are missing", 'status_code': 401}), 401
     email = request_data['email']
     password = request_data['password']
     login_validation = Validator()
     if not login_validation.validate_email(email):
         return jsonify({"message": "You entered an invalid email or the\
-                         email is missing"}), 401
+                         email is missing", 'status_code': 401}), 401
 
     if not login_validation.validate_password(password):
         return jsonify({"message": "You entered an invalid password,\
-                         password should be atleast 8 characters long"}), 401
+                         password should be atleast 8 characters long", 'status_code': 401}), 401
 
     user = User()
     check_user = user.get_user_by_email(email)
@@ -71,6 +71,6 @@ def login():
         return jsonify({
             'message': 'login successful',
             'auth_token': auth_token,
-            'user_Id': check_user[0]}), 200
+            'user_Id': check_user[0], 'status_code': 200}), 200
 
     return jsonify({"message": "You are not a system user", 'status_code': 401}), 401

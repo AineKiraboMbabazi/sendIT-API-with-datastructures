@@ -49,17 +49,17 @@ def create_parcel_order():
         return jsonify({"message": "destination cannot be equal to pickup","status_code":400}), 400
     if not (validate_input.validate_string_input(destination)):
         return jsonify({"message": "destination Field should\
-                         contain strings"}), 400
+                         contain strings",'status_code': 400}), 400
     if not (validate_input.validate_string_input(description)):
         return jsonify({"message": "destination Field should\
-                         contain strings"}), 400
+                         contain strings",'status_code': 400}), 400
     if not (validate_input.validate_string_input(pickup)):
-        return jsonify({"message": "pickup Field should contain strings"}), 400
+        return jsonify({"message": "pickup Field should contain strings",'status_code': 400}), 400
     parcel = Parcel()
     parcel.create_parcel(userId, creation_date, status, destination,
                          pickup, present_location, description)
 
-    return jsonify({"message": "Your parcel order has been created"}), 201
+    return jsonify({"message": "Your parcel order has been created", 'status_code': 201}), 201
 
 
 """
@@ -165,6 +165,7 @@ def update_present_location(parcelId):
         return jsonify({"message": "Present location is upto date",'status_code': 400}), 400
     if newlocation == Parcel_to_edit['destination']:
         Parcel_to_edit['status'] = 'Delivered'
+        parcel.update_present_location(Parcel_to_edit['status'], newlocation, parcelId)
         return jsonify({"message": "order delivered",'status_code': 200}), 200
     Parcel_to_edit['status'] = 'intransit'
     parcel.update_present_location(Parcel_to_edit['status'], newlocation, parcelId)
