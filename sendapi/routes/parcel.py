@@ -193,6 +193,10 @@ def update_destination(parcelId):
     if not parcel or parcel['status'] == 'Cancelled':
         return jsonify({"message": "The parcel you are editing doesnt\
                          exist", 'status_code':404}), 404
+    if parcel['status'] == 'intransit':
+        return jsonify({"message": "The parcel you cant edit parcel in transit", 'status_code':404}), 404
+    if parcel['status'] == 'Delivered':
+        return jsonify({"message": "The parcel you cant edit a Delivered parcel", 'status_code':404}), 404
     if not editor:
         return jsonify({"message": "You are not a registered user of the \
                         system", 'status_code':401}), 401
@@ -230,6 +234,8 @@ def delete_parcel(parcelId):
     parcel_to_delete = parcel.get_single_parcel(parcelId)
     if not parcel_to_delete or parcel_to_delete['status'] == 'Deleted':
         return jsonify({"message": "Order doesnt exist", 'status_code': 400}), 400
+    if parcel_to_delete['status'] == 'intransit':
+        return jsonify({"message": "The parcel you cant edit parcel in transit", 'status_code':404}), 404
     editor = user.get_user_by_id(userid)['role']
     if editor == 'admin':
         parcel.delete_parcel(parcelId)
