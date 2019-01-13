@@ -28,7 +28,6 @@ class DatabaseConnection:
 
         except Exception:
             return jsonify({"message": "Cant connect to database"})
-
     def create_db_tables(self):
         """
             Create users table
@@ -50,9 +49,9 @@ class DatabaseConnection:
                 userId INTEGER,
                 status VARCHAR(20),
                 creation_date TIMESTAMP,
-                destination VARCHAR(30),
-                pickup VARCHAR(30),
-                present_location VARCHAR(30),
+                destination VARCHAR(50),
+                pickup VARCHAR(50),
+                present_location VARCHAR(50),
                 description VARCHAR(100),
                 FOREIGN KEY (userId) REFERENCES users(userId)ON UPDATE CASCADE
                 );""")

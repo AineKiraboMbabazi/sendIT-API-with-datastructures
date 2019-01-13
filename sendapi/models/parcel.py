@@ -55,8 +55,8 @@ class Parcel:
             Function to delete parcel
             :param parcelId:
         """
-        delete_query = "DELETE FROM parcels WHERE parcelId=%s"
-        con.cursor.execute(delete_query, (parcelId,))
+        delete_query = "UPDATE parcels SET status=%s WHERE parcelId=%s"
+        con.cursor.execute(delete_query, ('Deleted',parcelId))
 
     def update_present_location(self, parcelId, newlocation, status):
         """

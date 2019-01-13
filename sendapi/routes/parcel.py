@@ -119,7 +119,7 @@ def cancel_specific_parcel(parcelId):
     userid = get_jwt_identity()
     parcel = Parcel()
     Parcel_to_edit = parcel.get_single_parcel(parcelId)
-    if not Parcel_to_edit:
+    if not Parcel_to_edit or Parcel_to_edit['status'] == 'Deleted':
         return jsonify({"message": " parcel doesnot exist",'status_code': 400}), 404
     parcel_owner_id = Parcel_to_edit['userid']
     if parcel_owner_id != userid:
@@ -127,8 +127,11 @@ def cancel_specific_parcel(parcelId):
                         order you created",'status_code': 400}), 400
     parcel_status = Parcel_to_edit['status']
     if parcel_status == 'Cancelled' or parcel_status == 'Delivered':
-        return jsonify({"message": "Cant update a cancelled or deivered \
+        return jsonify({"message": "Cant update a cancelled or delivered \
                         order ",'status_code': 400}), 400
+    if parcel_status == 'intransit':
+        return jsonify({"message": "Cant update an order in intransit\
+                         ",'status_code': 400}), 400
     parcel.cancel_parcel(parcelId)
     return jsonify({"message": "Your parcel order has been cancelled",'status_code':200}), 200
 
@@ -219,7 +222,7 @@ def update_destination(parcelId):
                     "updated_parcel": parcel,'status_code':201}), 201
 
 
-@app.route("/api/v1/parcels/<int:parcelId>", methods=['DELETE'])
+@app.route("/api/v1/parcels/<int:parcelId>/delete", methods=['PUT'])
 @jwt_required
 def delete_parcel(parcelId):
     """
@@ -238,6 +241,7 @@ def delete_parcel(parcelId):
         return jsonify({"message": "The parcel you cant edit parcel in transit", 'status_code':404}), 404
     editor = user.get_user_by_id(userid)['role']
     if editor == 'admin':
+        parcel_to_delete['status'] = 'Deleted'
         parcel.delete_parcel(parcelId)
         return jsonify({"message": "Your parcel has been deleted", 'status_code': 200}), 200
     return jsonify({"message": "only administrators can delete parcels", 'status_code': 400}), 400
