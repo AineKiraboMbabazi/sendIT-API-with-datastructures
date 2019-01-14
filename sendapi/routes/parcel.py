@@ -8,6 +8,28 @@ from validations import Validator
 from sendapi.models.parcel import Parcel
 from sendapi.models.user import User
 import datetime
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+ 
+def sendmail(location):
+    fromaddr = "weatherstationsecure@gmail.com"
+    toaddr =  "weatherstationsecure@gmail.com"
+    msg = MIMEMultipart()
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    msg['Subject'] = "PARCEL LOCATION ALERT"
+
+    body = "The parcel location has been updated to "+location
+    msg.attach(MIMEText(body, 'plain'))
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(fromaddr, "W1meaict.")
+    text = msg.as_string()
+    server.sendmail(fromaddr, toaddr, text)
+    server.quit()
+    return jsonify({"message":"email notification has been sent"})
 
 
 """Endpoint for the index page"""
@@ -172,6 +194,7 @@ def update_present_location(parcelId):
         return jsonify({"message": "order delivered",'status_code': 200}), 200
     Parcel_to_edit['status'] = 'intransit'
     parcel.update_present_location(Parcel_to_edit['status'], newlocation, parcelId)
+    sendmail(newlocation)
     parcel = parcel.get_single_parcel(parcelId)
     return jsonify({"message": "Your location has been updated ",
                     "updated parcel": parcel,'status_code': 200}), 200
@@ -217,6 +240,7 @@ def update_destination(parcelId):
     if not validate_destination:
         jsonify({"message": "destination must be a non empty string"}), 400
     Parcel().update_destination(parcelId, destination)
+    
     parcel = Parcel().get_single_parcel(parcelId)
     return jsonify({"message": "Your destination has been updated ",
                     "updated_parcel": parcel,'status_code':201}), 201
